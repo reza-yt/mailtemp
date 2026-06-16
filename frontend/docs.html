@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Docs - TempMail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="docs">
+  <header class="docs-header">
+    <a href="index.html" class="back-link">&larr; Back to TempMail</a>
+    <h1>TempMail API Documentation</h1>
+    <p>Use the TempMail API to generate disposable emails, read inbox, and auto-extract verification codes.</p>
+    <div class="base-url">
+      <span class="label">Base URL</span>
+      <code>https://mailtemp-api.pay67514.workers.dev</code>
+    </div>
+  </header>
+
+  <nav class="docs-nav">
+    <h3>Contents</h3>
+    <ul>
+      <li><a href="#auth">Authentication</a></li>
+      <li><a href="#generate">Generate Email</a></li>
+      <li><a href="#custom">Custom Username</a></li>
+      <li><a href="#inbox">Get Inbox</a></li>
+      <li><a href="#read">Read Email</a></li>
+      <li><a href="#extract">Extract Code</a></li>
+      <li><a href="#wait">Wait for Code</a></li>
+      <li><a href="#js-examples">JavaScript Examples</a></li>
+      <li><a href="#python-examples">Python Examples</a></li>
+    </ul>
+  </nav>
+
+  <main class="docs-content">
+
+    <!-- AUTH -->
+    <section id="auth">
+      <h2>Authentication</h2>
+      <p>Get your free API key by calling the generate key endpoint. Use the key in the <code>X-API-Key</code> header for all <code>/api/v1/</code> endpoints.</p>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/api/key/generate</code>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">Response</div>
+        <pre><code>{
+  "success": true,
+  "api_key": "mt_abc123xyz...",
+  "message": "Save this key! It won't be shown again.",
+  "usage": {
+    "header": "X-API-Key: mt_abc123xyz...",
+    "endpoints": [
+      "GET /api/v1/generate",
+      "POST /api/v1/generate",
+      "GET /api/v1/inbox/:address",
+      "GET /api/v1/extract-code/:address",
+      "GET /api/v1/wait-code/:address"
+    ]
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- GENERATE -->
+    <section id="generate">
+      <h2>Generate Random Email</h2>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/generate</code>
+        <span class="tag">Public</span>
+      </div>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/v1/generate</code>
+        <span class="tag auth">API Key</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">Response</div>
+        <pre><code>{
+  "success": true,
+  "email": "cool.fox123@mailtemp.web.id",
+  "username": "cool.fox123",
+  "expires_in": 3600,
+  "created_at": 1718560000000
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- CUSTOM -->
+    <section id="custom">
+      <h2>Custom Username</h2>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/generate?username=myname</code>
+      </div>
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/api/v1/generate</code>
+        <span class="tag auth">API Key</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">POST Body</div>
+        <pre><code>{
+  "username": "myname"
+}</code></pre>
+      </div>
+
+      <div class="params">
+        <h4>Username Rules</h4>
+        <ul>
+          <li>3-30 characters</li>
+          <li>Allowed: letters, numbers, dots, underscores</li>
+          <li>Case insensitive (stored as lowercase)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- INBOX -->
+    <section id="inbox">
+      <h2>Get Inbox</h2>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/inbox/:address</code>
+        <span class="tag">Public</span>
+      </div>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/v1/inbox/:address</code>
+        <span class="tag auth">API Key</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">Response</div>
+        <pre><code>{
+  "success": true,
+  "email": "cool.fox123@mailtemp.web.id",
+  "messages": [
+    {
+      "id": "uuid-here",
+      "address": "cool.fox123@mailtemp.web.id",
+      "sender": "noreply@example.com",
+      "subject": "Your verification code",
+      "received_at": 1718560050000
+    }
+  ],
+  "count": 1
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- READ -->
+    <section id="read">
+      <h2>Read Email</h2>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/email/:id</code>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">Response</div>
+        <pre><code>{
+  "success": true,
+  "email": {
+    "id": "uuid-here",
+    "address": "cool.fox123@mailtemp.web.id",
+    "sender": "noreply@example.com",
+    "subject": "Your verification code",
+    "body": "Your code is 483921",
+    "html": "&lt;p&gt;Your code is &lt;b&gt;483921&lt;/b&gt;&lt;/p&gt;",
+    "received_at": 1718560050000
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- EXTRACT CODE -->
+    <section id="extract">
+      <h2>Extract Verification Code</h2>
+      <p>Automatically extracts verification/OTP codes from the latest emails.</p>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/extract-code/:address</code>
+        <span class="tag">Public</span>
+      </div>
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/v1/extract-code/:address</code>
+        <span class="tag auth">API Key</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">Response</div>
+        <pre><code>{
+  "success": true,
+  "found": true,
+  "codes": [
+    {
+      "email_id": "uuid-here",
+      "sender": "noreply@example.com",
+      "subject": "Your verification code",
+      "codes": ["483921"],
+      "received_at": 1718560050000
+    }
+  ],
+  "checked_emails": 5
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- WAIT CODE -->
+    <section id="wait">
+      <h2>Wait for Code (Polling)</h2>
+      <p>Check for new verification codes since a timestamp. Useful for automated flows.</p>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/api/v1/wait-code/:address?timeout=30&since=timestamp</code>
+        <span class="tag auth">API Key</span>
+      </div>
+
+      <div class="params">
+        <h4>Parameters</h4>
+        <table>
+          <tr><th>Param</th><th>Type</th><th>Description</th></tr>
+          <tr><td>timeout</td><td>int</td><td>Max seconds (5-60, default 30)</td></tr>
+          <tr><td>since</td><td>int</td><td>Timestamp in ms (default: 2 min ago)</td></tr>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">Response</div>
+        <pre><code>{
+  "success": true,
+  "found": true,
+  "codes": [
+    {
+      "email_id": "uuid",
+      "sender": "service@app.com",
+      "subject": "Verify your account",
+      "codes": ["582910"],
+      "received_at": 1718560100000
+    }
+  ],
+  "address": "myname@mailtemp.web.id",
+  "since": 1718559900000,
+  "checked_at": 1718560105000
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- JS EXAMPLES -->
+    <section id="js-examples">
+      <h2>JavaScript Examples</h2>
+
+      <div class="code-block">
+        <div class="code-header">Generate & Get Code (Node.js / Browser)</div>
+        <pre><code>const API_URL = "https://mailtemp-api.pay67514.workers.dev";
+const API_KEY = "mt_your_api_key_here";
+
+// Generate a temp email
+async function generateEmail(customUsername) {
+  const url = customUsername
+    ? `${API_URL}/api/v1/generate`
+    : `${API_URL}/api/v1/generate`;
+
+  const options = {
+    method: customUsername ? "POST" : "GET",
+    headers: {
+      "X-API-Key": API_KEY,
+      "Content-Type": "application/json"
+    }
+  };
+
+  if (customUsername) {
+    options.body = JSON.stringify({ username: customUsername });
+  }
+
+  const res = await fetch(url, options);
+  return await res.json();
+}
+
+// Get inbox
+async function getInbox(email) {
+  const res = await fetch(
+    `${API_URL}/api/v1/inbox/${encodeURIComponent(email)}`,
+    { headers: { "X-API-Key": API_KEY } }
+  );
+  return await res.json();
+}
+
+// Wait for verification code
+async function waitForCode(email, timeoutSec = 30) {
+  const since = Date.now();
+  const maxAttempts = Math.ceil(timeoutSec / 5);
+
+  for (let i = 0; i &lt; maxAttempts; i++) {
+    const res = await fetch(
+      `${API_URL}/api/v1/wait-code/${encodeURIComponent(email)}?since=${since}`,
+      { headers: { "X-API-Key": API_KEY } }
+    );
+    const data = await res.json();
+
+    if (data.found &amp;&amp; data.codes.length > 0) {
+      return data.codes[0].codes[0]; // First code from first email
+    }
+
+    // Wait 5 seconds before retry
+    await new Promise(r => setTimeout(r, 5000));
+  }
+
+  return null; // No code found
+}
+
+// === FULL EXAMPLE ===
+async function main() {
+  // 1. Generate email
+  const { email } = await generateEmail("mybot.test");
+  console.log("Temp email:", email);
+
+  // 2. Use this email to register somewhere...
+  console.log("Register with:", email);
+
+  // 3. Wait for verification code
+  console.log("Waiting for code...");
+  const code = await waitForCode(email, 60);
+
+  if (code) {
+    console.log("Got verification code:", code);
+  } else {
+    console.log("No code received within timeout");
+  }
+}
+
+main();</code></pre>
+      </div>
+    </section>
+
+    <!-- PYTHON EXAMPLES -->
+    <section id="python-examples">
+      <h2>Python Examples</h2>
+
+      <div class="code-block">
+        <div class="code-header">Generate & Get Code (Python 3)</div>
+        <pre><code>import requests
+import time
+import urllib.parse
+
+API_URL = "https://mailtemp-api.pay67514.workers.dev"
+API_KEY = "mt_your_api_key_here"
+
+HEADERS = {
+    "X-API-Key": API_KEY,
+    "Content-Type": "application/json"
+}
+
+
+def generate_email(username=None):
+    """Generate a temporary email address."""
+    if username:
+        res = requests.post(
+            f"{API_URL}/api/v1/generate",
+            headers=HEADERS,
+            json={"username": username}
+        )
+    else:
+        res = requests.get(
+            f"{API_URL}/api/v1/generate",
+            headers=HEADERS
+        )
+    return res.json()
+
+
+def get_inbox(email):
+    """Get all emails in the inbox."""
+    encoded = urllib.parse.quote(email)
+    res = requests.get(
+        f"{API_URL}/api/v1/inbox/{encoded}",
+        headers=HEADERS
+    )
+    return res.json()
+
+
+def extract_code(email):
+    """Extract verification codes from emails."""
+    encoded = urllib.parse.quote(email)
+    res = requests.get(
+        f"{API_URL}/api/v1/extract-code/{encoded}",
+        headers=HEADERS
+    )
+    return res.json()
+
+
+def wait_for_code(email, timeout=60, interval=5):
+    """
+    Wait for a verification code to arrive.
+    Polls every `interval` seconds, up to `timeout` seconds.
+    Returns the code string or None.
+    """
+    since = int(time.time() * 1000)
+    elapsed = 0
+
+    while elapsed &lt; timeout:
+        encoded = urllib.parse.quote(email)
+        res = requests.get(
+            f"{API_URL}/api/v1/wait-code/{encoded}?since={since}",
+            headers=HEADERS
+        )
+        data = res.json()
+
+        if data.get("found") and data.get("codes"):
+            codes = data["codes"][0]["codes"]
+            if codes:
+                return codes[0]
+
+        time.sleep(interval)
+        elapsed += interval
+
+    return None
+
+
+# === FULL EXAMPLE ===
+if __name__ == "__main__":
+    # 1. Generate email (random or custom)
+    result = generate_email("mybot.test")
+    email = result["email"]
+    print(f"Temp email: {email}")
+
+    # 2. Use this email to register somewhere...
+    print(f"Register with: {email}")
+
+    # 3. Wait for verification code
+    print("Waiting for verification code...")
+    code = wait_for_code(email, timeout=60)
+
+    if code:
+        print(f"Got verification code: {code}")
+    else:
+        print("No code received within timeout")
+</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">pip install</div>
+        <pre><code>pip install requests</code></pre>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0a0a1a;
+  color: #e0e0f0;
+  line-height: 1.6;
+}
+.docs { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+.docs-header { margin-bottom: 40px; }
+.back-link { color: #6c63ff; text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 16px; }
+.back-link:hover { text-decoration: underline; }
+.docs-header h1 { font-size: 2rem; margin-bottom: 8px; background: linear-gradient(135deg, #6c63ff, #4fc3f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.docs-header p { color: #8888aa; margin-bottom: 16px; }
+.base-url { background: #1a1a3e; border: 1px solid #2a2a5a; border-radius: 8px; padding: 12px 16px; }
+.base-url .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; }
+.base-url code { color: #4fc3f7; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+
+.docs-nav { background: #12122a; border: 1px solid #2a2a5a; border-radius: 12px; padding: 20px 24px; margin-bottom: 40px; }
+.docs-nav h3 { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.docs-nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.docs-nav a { color: #6c63ff; text-decoration: none; font-size: 0.85rem; padding: 4px 12px; border: 1px solid #2a2a5a; border-radius: 6px; transition: all 0.2s; }
+.docs-nav a:hover { background: rgba(108,99,255,0.1); border-color: #6c63ff; }
+
+.docs-content section { margin-bottom: 48px; padding-top: 20px; border-top: 1px solid #1a1a3e; }
+.docs-content h2 { font-size: 1.4rem; margin-bottom: 12px; color: #fff; }
+.docs-content p { color: #aaa; margin-bottom: 16px; }
+
+.endpoint { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.method { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+.method.get { background: #1b5e20; color: #81c784; }
+.method.post { background: #e65100; color: #ffcc80; }
+.method.delete { background: #b71c1c; color: #ef9a9a; }
+.endpoint code { color: #4fc3f7; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+.tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: #2a2a5a; color: #888; }
+.tag.auth { background: #4a148c; color: #ce93d8; }
+
+.code-block { background: #0d0d20; border: 1px solid #2a2a5a; border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+.code-header { padding: 10px 16px; background: #12122a; border-bottom: 1px solid #2a2a5a; font-size: 0.8rem; color: #888; font-weight: 500; }
+.code-block pre { padding: 16px; overflow-x: auto; }
+.code-block code { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.6; color: #d4d4ff; }
+
+.params { background: #12122a; border: 1px solid #2a2a5a; border-radius: 10px; padding: 16px 20px; margin-bottom: 16px; }
+.params h4 { font-size: 0.9rem; margin-bottom: 10px; color: #fff; }
+.params ul { padding-left: 20px; color: #aaa; font-size: 0.9rem; }
+.params li { margin-bottom: 4px; }
+.params table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.params th { text-align: left; padding: 8px; border-bottom: 1px solid #2a2a5a; color: #888; }
+.params td { padding: 8px; border-bottom: 1px solid #1a1a3e; color: #ccc; }
+
+@media (max-width: 600px) {
+  .docs-header h1 { font-size: 1.5rem; }
+  .docs-nav ul { flex-direction: column; }
+}
+</style>
+</body>
+</html>

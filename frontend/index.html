@@ -4,431 +4,523 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TempMail - mailtemp.web.id</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f0f23;
-      color: #e0e0e0;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      padding: 40px 0 30px;
-    }
-    header h1 {
-      font-size: 2rem;
-      color: #fff;
-      margin-bottom: 8px;
-    }
-    header p {
-      color: #888;
-      font-size: 0.95rem;
-    }
-    .email-box {
-      background: #1a1a2e;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .email-box label {
-      display: block;
-      color: #888;
-      font-size: 0.85rem;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .email-display {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .email-address {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: #4fc3f7;
-      word-break: break-all;
-    }
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    .btn-copy {
-      background: #4fc3f7;
-      color: #000;
-    }
-    .btn-copy:hover { background: #81d4fa; }
-    .btn-new {
-      background: #333;
-      color: #fff;
-      border: 1px solid #555;
-    }
-    .btn-new:hover { background: #444; }
-    .btn-refresh {
-      background: #2e7d32;
-      color: #fff;
-    }
-    .btn-refresh:hover { background: #388e3c; }
-    .actions {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    .inbox {
-      background: #1a1a2e;
-      border: 1px solid #333;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .inbox-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .inbox-header h2 {
-      font-size: 1.1rem;
-      color: #fff;
-    }
-    .inbox-count {
-      background: #4fc3f7;
-      color: #000;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .email-list {
-      list-style: none;
-    }
-    .email-item {
-      padding: 16px 20px;
-      border-bottom: 1px solid #222;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .email-item:hover { background: #222; }
-    .email-item:last-child { border-bottom: none; }
-    .email-sender {
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 4px;
-      font-size: 0.95rem;
-    }
-    .email-subject {
-      color: #aaa;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-    .email-time {
-      color: #666;
-      font-size: 0.8rem;
-    }
-    .empty-inbox {
-      padding: 60px 20px;
-      text-align: center;
-      color: #666;
-    }
-    .empty-inbox p {
-      margin-top: 12px;
-      font-size: 0.95rem;
-    }
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .modal-overlay.active { display: flex; }
-    .modal {
-      background: #1a1a2e;
-      border: 1px solid #333;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal-header {
-      padding: 20px;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-    .modal-header h3 {
-      color: #fff;
-      font-size: 1.1rem;
-      flex: 1;
-      margin-right: 12px;
-    }
-    .modal-close {
-      background: none;
-      border: none;
-      color: #888;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    .modal-close:hover { color: #fff; }
-    .modal-meta {
-      padding: 16px 20px;
-      border-bottom: 1px solid #222;
-      font-size: 0.85rem;
-      color: #888;
-    }
-    .modal-meta span {
-      display: block;
-      margin-bottom: 4px;
-    }
-    .modal-body {
-      padding: 20px;
-      color: #ddd;
-      line-height: 1.6;
-      word-wrap: break-word;
-    }
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #888;
-    }
-    .timer {
-      color: #f44336;
-      font-size: 0.85rem;
-      margin-top: 12px;
-    }
-    @media (max-width: 600px) {
-      .email-address { font-size: 1.1rem; }
-      header h1 { font-size: 1.5rem; }
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>TempMail</h1>
-      <p>Disposable email address - no registration required</p>
-    </header>
+<div class="app" id="app">
+  <div class="bg-effects">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
 
-    <div class="email-box">
-      <label>Your Temporary Email</label>
-      <div class="email-display">
-        <span class="email-address" id="emailAddress">Loading...</span>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">M</div>
+      <h1>TempMail</h1>
+    </div>
+    <p class="tagline">Disposable email in seconds. No signup required.</p>
+    <nav class="nav-links">
+      <a href="docs.html" class="nav-link">API Docs</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="email-card" id="emailCard">
+      <div class="card-glow"></div>
+      <label class="card-label">YOUR TEMPORARY EMAIL</label>
+
+      <div class="email-input-group" id="emailInputGroup">
+        <div class="email-display" id="emailDisplayMode">
+          <span class="email-address" id="emailAddress">Generating...</span>
+        </div>
+        <div class="email-custom" id="emailCustomMode" style="display:none;">
+          <input type="text" id="customUsername" placeholder="your.username" class="input-username" maxlength="30">
+          <span class="domain-suffix">@mailtemp.web.id</span>
+        </div>
       </div>
-      <div class="actions">
-        <button class="btn btn-copy" id="btnCopy">Copy</button>
-        <button class="btn btn-new" id="btnNew">New Address</button>
-        <button class="btn btn-refresh" id="btnRefresh">Refresh Inbox</button>
+
+      <div class="card-actions">
+        <button class="btn btn-primary" id="btnCopy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+        <button class="btn btn-secondary" id="btnCustom">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Custom
+        </button>
+        <button class="btn btn-secondary" id="btnNew">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Random
+        </button>
       </div>
+
       <div class="timer" id="timer"></div>
     </div>
 
-    <div class="inbox">
+    <div class="inbox-card">
       <div class="inbox-header">
         <h2>Inbox</h2>
-        <span class="inbox-count" id="inboxCount">0</span>
+        <div class="inbox-actions">
+          <span class="badge" id="inboxCount">0</span>
+          <button class="btn-icon" id="btnRefresh" title="Refresh">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+        </div>
       </div>
-      <div id="inboxContent">
-        <div class="empty-inbox">
-          <p>No emails yet. Send an email to the address above!</p>
-          <p>Auto-refresh every 5 seconds.</p>
+
+      <div class="inbox-body" id="inboxContent">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <p>No emails yet</p>
+          <span class="empty-hint">Send an email to the address above. Auto-refresh every 5s.</span>
         </div>
       </div>
     </div>
-  </div>
+  </main>
+</div>
 
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="modalSubject">Subject</h3>
-        <button class="modal-close" id="modalClose">&times;</button>
-      </div>
-      <div class="modal-meta" id="modalMeta"></div>
-      <div class="modal-body" id="modalBody"></div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 id="modalSubject">Subject</h3>
+      <button class="modal-close" id="modalClose">&times;</button>
     </div>
+    <div class="modal-meta" id="modalMeta"></div>
+    <div class="modal-body" id="modalBody"></div>
   </div>
+</div>
 
-  <script>
-    // CHANGE THIS to your API worker URL
-    var API_URL = "https://mailtemp-api.pay67514.workers.dev";
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #12122a;
+  --bg-card: #1a1a3e;
+  --border: #2a2a5a;
+  --text-primary: #f0f0ff;
+  --text-secondary: #8888aa;
+  --accent: #6c63ff;
+  --accent-light: #8b83ff;
+  --accent-glow: rgba(108, 99, 255, 0.3);
+  --success: #4caf50;
+  --danger: #f44336;
+  --gradient: linear-gradient(135deg, #6c63ff, #4fc3f7);
+}
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.app { position: relative; min-height: 100vh; padding: 20px; max-width: 900px; margin: 0 auto; }
 
-    var currentEmail = "";
-    var createdAt = 0;
-    var refreshInterval = null;
+/* Background Effects */
+.bg-effects { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  animation: float 20s infinite ease-in-out;
+}
+.orb-1 { width: 400px; height: 400px; background: #6c63ff; top: -100px; left: -100px; }
+.orb-2 { width: 300px; height: 300px; background: #4fc3f7; bottom: -50px; right: -50px; animation-delay: -7s; }
+.orb-3 { width: 250px; height: 250px; background: #ff6bcb; top: 50%; left: 50%; animation-delay: -14s; }
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
 
-    function init() {
-      var saved = localStorage.getItem("tempmail_address");
-      var savedTime = localStorage.getItem("tempmail_created");
+/* Header */
+.header { position: relative; z-index: 1; text-align: center; padding: 40px 0 30px; animation: fadeInDown 0.6s ease; }
+.logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
+.logo-icon {
+  width: 40px; height: 40px;
+  background: var(--gradient);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.2rem; color: #fff;
+}
+.header h1 { font-size: 1.8rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.tagline { color: var(--text-secondary); font-size: 0.95rem; }
+.nav-links { margin-top: 12px; }
+.nav-link { color: var(--accent); text-decoration: none; font-size: 0.85rem; padding: 6px 16px; border: 1px solid var(--border); border-radius: 20px; transition: all 0.3s; }
+.nav-link:hover { background: var(--accent-glow); border-color: var(--accent); }
 
-      if (saved && savedTime) {
-        var elapsed = Date.now() - parseInt(savedTime);
-        if (elapsed < 3600000) {
-          currentEmail = saved;
-          createdAt = parseInt(savedTime);
-          showEmail();
-          fetchInbox();
-          startAutoRefresh();
-          updateTimer();
-          return;
+/* Main */
+.main { position: relative; z-index: 1; }
+
+/* Email Card */
+.email-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 24px;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease 0.1s both;
+}
+.card-glow {
+  position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
+  opacity: 0; transition: opacity 0.5s;
+}
+.email-card:hover .card-glow { opacity: 1; }
+.card-label { display: block; color: var(--text-secondary); font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 16px; font-weight: 500; }
+
+.email-display { display: flex; align-items: center; justify-content: center; }
+.email-address { font-size: 1.5rem; font-weight: 600; color: var(--accent-light); word-break: break-all; transition: all 0.3s; }
+
+.email-custom { display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap; }
+.input-username {
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 16px; color: var(--text-primary); font-size: 1.1rem; font-family: inherit;
+  outline: none; width: 200px; text-align: right; transition: border-color 0.3s;
+}
+.input-username:focus { border-color: var(--accent); }
+.domain-suffix { color: var(--text-secondary); font-size: 1.1rem; }
+
+/* Buttons */
+.card-actions { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border: none; border-radius: 10px;
+  cursor: pointer; font-size: 0.9rem; font-weight: 500;
+  font-family: inherit; transition: all 0.3s ease;
+  transform: translateY(0);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--gradient); color: #fff; box-shadow: 0 4px 15px var(--accent-glow); }
+.btn-primary:hover { box-shadow: 0 6px 25px var(--accent-glow); }
+.btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); background: rgba(108,99,255,0.1); }
+.btn-icon { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 8px; cursor: pointer; color: var(--text-secondary); transition: all 0.3s; }
+.btn-icon:hover { color: var(--accent); border-color: var(--accent); }
+
+.timer { color: var(--danger); font-size: 0.85rem; margin-top: 14px; opacity: 0.8; }
+
+/* Inbox */
+.inbox-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  overflow: hidden; animation: fadeInUp 0.6s ease 0.2s both;
+}
+.inbox-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.inbox-header h2 { font-size: 1.1rem; font-weight: 600; }
+.inbox-actions { display: flex; align-items: center; gap: 10px; }
+.badge { background: var(--accent); color: #fff; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+.inbox-body { min-height: 200px; }
+
+.empty-state { padding: 60px 20px; text-align: center; animation: fadeIn 0.5s ease; }
+.empty-icon { color: var(--text-secondary); margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { color: var(--text-secondary); font-size: 1rem; margin-bottom: 6px; }
+.empty-hint { color: var(--text-secondary); font-size: 0.8rem; opacity: 0.6; }
+
+.email-list { list-style: none; }
+.email-item {
+  padding: 18px 24px; border-bottom: 1px solid rgba(42,42,90,0.5);
+  cursor: pointer; transition: all 0.2s ease; animation: slideIn 0.3s ease both;
+}
+.email-item:hover { background: rgba(108,99,255,0.05); padding-left: 28px; }
+.email-item:last-child { border-bottom: none; }
+.email-sender { font-weight: 600; color: var(--text-primary); margin-bottom: 4px; font-size: 0.95rem; }
+.email-subject { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.email-time { color: var(--text-secondary); font-size: 0.75rem; opacity: 0.6; }
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+  z-index: 1000; justify-content: center; align-items: center; padding: 20px;
+}
+.modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+.modal {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  width: 100%; max-width: 650px; max-height: 80vh; overflow-y: auto;
+  animation: scaleIn 0.3s ease;
+}
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-header h3 { color: var(--text-primary); font-size: 1.1rem; flex: 1; margin-right: 12px; }
+.modal-close { background: none; border: none; color: var(--text-secondary); font-size: 1.8rem; cursor: pointer; line-height: 1; transition: color 0.3s; }
+.modal-close:hover { color: var(--text-primary); }
+.modal-meta { padding: 16px 24px; border-bottom: 1px solid rgba(42,42,90,0.5); font-size: 0.85rem; color: var(--text-secondary); }
+.modal-meta span { display: block; margin-bottom: 4px; }
+.modal-body { padding: 24px; color: var(--text-primary); line-height: 1.7; word-wrap: break-word; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.loading-pulse { animation: pulse 1.5s infinite; }
+.copied-flash { animation: copiedFlash 0.5s ease; }
+@keyframes copiedFlash { 0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); } 100% { box-shadow: 0 0 0 20px rgba(76,175,80,0); } }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .email-address { font-size: 1.1rem; }
+  .header h1 { font-size: 1.4rem; }
+  .email-card { padding: 24px 16px; }
+  .card-actions { gap: 6px; }
+  .btn { padding: 8px 14px; font-size: 0.85rem; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+</style>
+
+<script>
+var API_URL = "https://mailtemp-api.pay67514.workers.dev";
+var currentEmail = "";
+var createdAt = 0;
+var refreshInterval = null;
+var isCustomMode = false;
+
+function init() {
+  var saved = localStorage.getItem("tempmail_address");
+  var savedTime = localStorage.getItem("tempmail_created");
+
+  if (saved && savedTime) {
+    var elapsed = Date.now() - parseInt(savedTime);
+    if (elapsed < 3600000) {
+      currentEmail = saved;
+      createdAt = parseInt(savedTime);
+      showEmail();
+      fetchInbox();
+      startAutoRefresh();
+      updateTimer();
+      return;
+    }
+  }
+  generateNew();
+}
+
+function generateNew() {
+  document.getElementById("emailAddress").textContent = "Generating...";
+  document.getElementById("emailAddress").classList.add("loading-pulse");
+
+  fetch(API_URL + "/api/generate")
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        currentEmail = data.email;
+        createdAt = data.created_at;
+        localStorage.setItem("tempmail_address", currentEmail);
+        localStorage.setItem("tempmail_created", String(createdAt));
+        showEmail();
+        fetchInbox();
+        startAutoRefresh();
+        updateTimer();
+      }
+    })
+    .catch(function(err) {
+      document.getElementById("emailAddress").textContent = "Error - try again";
+      document.getElementById("emailAddress").classList.remove("loading-pulse");
+    });
+}
+
+function generateCustom(username) {
+  if (!username || username.length < 3) {
+    alert("Username minimal 3 karakter!");
+    return;
+  }
+
+  fetch(API_URL + "/api/generate?username=" + encodeURIComponent(username))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        currentEmail = data.email;
+        createdAt = data.created_at;
+        localStorage.setItem("tempmail_address", currentEmail);
+        localStorage.setItem("tempmail_created", String(createdAt));
+        toggleCustomMode(false);
+        showEmail();
+        fetchInbox();
+        startAutoRefresh();
+        updateTimer();
+      } else {
+        alert(data.error || "Error generating email");
+      }
+    })
+    .catch(function(err) {
+      alert("Error - try again");
+    });
+}
+
+function showEmail() {
+  var el = document.getElementById("emailAddress");
+  el.textContent = currentEmail;
+  el.classList.remove("loading-pulse");
+}
+
+function toggleCustomMode(show) {
+  isCustomMode = show;
+  document.getElementById("emailDisplayMode").style.display = show ? "none" : "flex";
+  document.getElementById("emailCustomMode").style.display = show ? "flex" : "none";
+  if (show) {
+    document.getElementById("customUsername").focus();
+  }
+}
+
+function fetchInbox() {
+  var encoded = encodeURIComponent(currentEmail);
+  fetch(API_URL + "/api/inbox/" + encoded)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        renderInbox(data.messages);
+        document.getElementById("inboxCount").textContent = String(data.count);
+      }
+    })
+    .catch(function(err) { });
+}
+
+function renderInbox(messages) {
+  var container = document.getElementById("inboxContent");
+  if (!messages || messages.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><p>No emails yet</p><span class="empty-hint">Send an email to the address above. Auto-refresh every 5s.</span></div>';
+    return;
+  }
+
+  var html = '<ul class="email-list">';
+  for (var i = 0; i < messages.length; i++) {
+    var msg = messages[i];
+    var time = timeAgo(msg.received_at);
+    html += '<li class="email-item" style="animation-delay:' + (i * 0.05) + 's" onclick="openEmail(\'' + msg.id + '\')">';
+    html += '<div class="email-sender">' + escapeHtml(msg.sender) + '</div>';
+    html += '<div class="email-subject">' + escapeHtml(msg.subject) + '</div>';
+    html += '<div class="email-time">' + time + '</div>';
+    html += '</li>';
+  }
+  html += '</ul>';
+  container.innerHTML = html;
+}
+
+function openEmail(id) {
+  fetch(API_URL + "/api/email/" + id)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        var email = data.email;
+        document.getElementById("modalSubject").textContent = email.subject;
+        document.getElementById("modalMeta").innerHTML =
+          "<span><strong>From:</strong> " + escapeHtml(email.sender) + "</span>" +
+          "<span><strong>To:</strong> " + escapeHtml(email.address) + "</span>" +
+          "<span><strong>Date:</strong> " + new Date(email.received_at).toLocaleString() + "</span>";
+
+        if (email.html && email.html.indexOf("<") !== -1) {
+          document.getElementById("modalBody").innerHTML = email.html;
+        } else {
+          document.getElementById("modalBody").textContent = email.body || "(Empty)";
         }
+        document.getElementById("modalOverlay").classList.add("active");
       }
+    });
+}
 
-      generateNew();
-    }
+function startAutoRefresh() {
+  if (refreshInterval) clearInterval(refreshInterval);
+  refreshInterval = setInterval(fetchInbox, 5000);
+}
 
-    function generateNew() {
-      fetch(API_URL + "/api/generate")
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.success) {
-            currentEmail = data.email;
-            createdAt = data.created_at;
-            localStorage.setItem("tempmail_address", currentEmail);
-            localStorage.setItem("tempmail_created", String(createdAt));
-            showEmail();
-            fetchInbox();
-            startAutoRefresh();
-            updateTimer();
-          }
-        })
-        .catch(function(err) {
-          document.getElementById("emailAddress").textContent = "Error loading...";
-        });
-    }
-
-    function showEmail() {
-      document.getElementById("emailAddress").textContent = currentEmail;
-    }
-
-    function fetchInbox() {
-      var encoded = encodeURIComponent(currentEmail);
-      fetch(API_URL + "/api/inbox/" + encoded)
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.success) {
-            renderInbox(data.messages);
-            document.getElementById("inboxCount").textContent = String(data.count);
-          }
-        })
-        .catch(function(err) {
-          console.error("Fetch inbox error:", err);
-        });
-    }
-
-    function renderInbox(messages) {
-      var container = document.getElementById("inboxContent");
-      if (!messages || messages.length === 0) {
-        container.innerHTML = '<div class="empty-inbox"><p>No emails yet. Send an email to the address above!</p><p>Auto-refresh every 5 seconds.</p></div>';
-        return;
-      }
-
-      var html = '<ul class="email-list">';
-      for (var i = 0; i < messages.length; i++) {
-        var msg = messages[i];
-        var time = new Date(msg.received_at).toLocaleString();
-        html += '<li class="email-item" onclick="openEmail(\'' + msg.id + '\')">';
-        html += '<div class="email-sender">' + escapeHtml(msg.sender) + '</div>';
-        html += '<div class="email-subject">' + escapeHtml(msg.subject) + '</div>';
-        html += '<div class="email-time">' + time + '</div>';
-        html += '</li>';
-      }
-      html += '</ul>';
-      container.innerHTML = html;
-    }
-
-    function openEmail(id) {
-      fetch(API_URL + "/api/email/" + id)
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.success) {
-            var email = data.email;
-            document.getElementById("modalSubject").textContent = email.subject;
-            document.getElementById("modalMeta").innerHTML =
-              "<span><strong>From:</strong> " + escapeHtml(email.sender) + "</span>" +
-              "<span><strong>To:</strong> " + escapeHtml(email.address) + "</span>" +
-              "<span><strong>Date:</strong> " + new Date(email.received_at).toLocaleString() + "</span>";
-
-            if (email.html && email.html.indexOf("<") !== -1) {
-              document.getElementById("modalBody").innerHTML = email.html;
-            } else {
-              document.getElementById("modalBody").textContent = email.body || "(Empty)";
-            }
-            document.getElementById("modalOverlay").classList.add("active");
-          }
-        });
-    }
-
-    function startAutoRefresh() {
+function updateTimer() {
+  setInterval(function() {
+    var elapsed = Date.now() - createdAt;
+    var remaining = 3600000 - elapsed;
+    if (remaining <= 0) {
+      document.getElementById("timer").textContent = "Expired! Generate a new address.";
       if (refreshInterval) clearInterval(refreshInterval);
-      refreshInterval = setInterval(fetchInbox, 5000);
+      return;
     }
+    var mins = Math.floor(remaining / 60000);
+    var secs = Math.floor((remaining % 60000) / 1000);
+    document.getElementById("timer").textContent = "Expires in: " + mins + "m " + secs + "s";
+  }, 1000);
+}
 
-    function updateTimer() {
-      setInterval(function() {
-        var elapsed = Date.now() - createdAt;
-        var remaining = 3600000 - elapsed;
-        if (remaining <= 0) {
-          document.getElementById("timer").textContent = "Expired! Generate a new address.";
-          if (refreshInterval) clearInterval(refreshInterval);
-          return;
-        }
-        var mins = Math.floor(remaining / 60000);
-        var secs = Math.floor((remaining % 60000) / 1000);
-        document.getElementById("timer").textContent = "Expires in: " + mins + "m " + secs + "s";
-      }, 1000);
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  if (diff < 60000) return "Just now";
+  if (diff < 3600000) return Math.floor(diff / 60000) + "m ago";
+  return new Date(ts).toLocaleString();
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// Event Listeners
+document.getElementById("btnCopy").addEventListener("click", function() {
+  navigator.clipboard.writeText(currentEmail).then(function() {
+    var btn = document.getElementById("btnCopy");
+    var card = document.getElementById("emailCard");
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    card.classList.add("copied-flash");
+    setTimeout(function() {
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+      card.classList.remove("copied-flash");
+    }, 2000);
+  });
+});
+
+document.getElementById("btnCustom").addEventListener("click", function() {
+  if (isCustomMode) {
+    var username = document.getElementById("customUsername").value.trim();
+    if (username) {
+      generateCustom(username);
+    } else {
+      toggleCustomMode(false);
     }
+  } else {
+    toggleCustomMode(true);
+  }
+});
 
-    function escapeHtml(str) {
-      if (!str) return "";
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    }
+document.getElementById("customUsername").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    var username = this.value.trim();
+    if (username) generateCustom(username);
+  }
+});
 
-    document.getElementById("btnCopy").addEventListener("click", function() {
-      navigator.clipboard.writeText(currentEmail).then(function() {
-        var btn = document.getElementById("btnCopy");
-        btn.textContent = "Copied!";
-        setTimeout(function() { btn.textContent = "Copy"; }, 2000);
-      });
-    });
+document.getElementById("btnNew").addEventListener("click", function() {
+  localStorage.removeItem("tempmail_address");
+  localStorage.removeItem("tempmail_created");
+  toggleCustomMode(false);
+  generateNew();
+});
 
-    document.getElementById("btnNew").addEventListener("click", function() {
-      localStorage.removeItem("tempmail_address");
-      localStorage.removeItem("tempmail_created");
-      generateNew();
-    });
+document.getElementById("btnRefresh").addEventListener("click", function() {
+  this.style.transform = "rotate(360deg)";
+  var self = this;
+  setTimeout(function() { self.style.transform = ""; }, 500);
+  fetchInbox();
+});
 
-    document.getElementById("btnRefresh").addEventListener("click", fetchInbox);
+document.getElementById("modalClose").addEventListener("click", function() {
+  document.getElementById("modalOverlay").classList.remove("active");
+});
 
-    document.getElementById("modalClose").addEventListener("click", function() {
-      document.getElementById("modalOverlay").classList.remove("active");
-    });
+document.getElementById("modalOverlay").addEventListener("click", function(e) {
+  if (e.target === this) this.classList.remove("active");
+});
 
-    document.getElementById("modalOverlay").addEventListener("click", function(e) {
-      if (e.target === this) this.classList.remove("active");
-    });
-
-    init();
-  </script>
+init();
+</script>
 </body>
 </html>
