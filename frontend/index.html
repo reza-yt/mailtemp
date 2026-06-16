@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TempMail - mailtemp.web.id</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f23;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      padding: 40px 0 30px;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    header p {
+      color: #888;
+      font-size: 0.95rem;
+    }
+    .email-box {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .email-box label {
+      display: block;
+      color: #888;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .email-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .email-address {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #4fc3f7;
+      word-break: break-all;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-copy {
+      background: #4fc3f7;
+      color: #000;
+    }
+    .btn-copy:hover { background: #81d4fa; }
+    .btn-new {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+    }
+    .btn-new:hover { background: #444; }
+    .btn-refresh {
+      background: #2e7d32;
+      color: #fff;
+    }
+    .btn-refresh:hover { background: #388e3c; }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .inbox {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .inbox-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .inbox-header h2 {
+      font-size: 1.1rem;
+      color: #fff;
+    }
+    .inbox-count {
+      background: #4fc3f7;
+      color: #000;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .email-list {
+      list-style: none;
+    }
+    .email-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid #222;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .email-item:hover { background: #222; }
+    .email-item:last-child { border-bottom: none; }
+    .email-sender {
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+    .email-subject {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .email-time {
+      color: #666;
+      font-size: 0.8rem;
+    }
+    .empty-inbox {
+      padding: 60px 20px;
+      text-align: center;
+      color: #666;
+    }
+    .empty-inbox p {
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .modal-header h3 {
+      color: #fff;
+      font-size: 1.1rem;
+      flex: 1;
+      margin-right: 12px;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-meta {
+      padding: 16px 20px;
+      border-bottom: 1px solid #222;
+      font-size: 0.85rem;
+      color: #888;
+    }
+    .modal-meta span {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .modal-body {
+      padding: 20px;
+      color: #ddd;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+    }
+    .timer {
+      color: #f44336;
+      font-size: 0.85rem;
+      margin-top: 12px;
+    }
+    @media (max-width: 600px) {
+      .email-address { font-size: 1.1rem; }
+      header h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>TempMail</h1>
+      <p>Disposable email address - no registration required</p>
+    </header>
+
+    <div class="email-box">
+      <label>Your Temporary Email</label>
+      <div class="email-display">
+        <span class="email-address" id="emailAddress">Loading...</span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-copy" id="btnCopy">Copy</button>
+        <button class="btn btn-new" id="btnNew">New Address</button>
+        <button class="btn btn-refresh" id="btnRefresh">Refresh Inbox</button>
+      </div>
+      <div class="timer" id="timer"></div>
+    </div>
+
+    <div class="inbox">
+      <div class="inbox-header">
+        <h2>Inbox</h2>
+        <span class="inbox-count" id="inboxCount">0</span>
+      </div>
+      <div id="inboxContent">
+        <div class="empty-inbox">
+          <p>No emails yet. Send an email to the address above!</p>
+          <p>Auto-refresh every 5 seconds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalSubject">Subject</h3>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    // CHANGE THIS to your API worker URL
+    var API_URL = "https://mailtemp-api.pay67514.workers.dev";
+
+    var currentEmail = "";
+    var createdAt = 0;
+    var refreshInterval = null;
+
+    function init() {
+      var saved = localStorage.getItem("tempmail_address");
+      var savedTime = localStorage.getItem("tempmail_created");
+
+      if (saved && savedTime) {
+        var elapsed = Date.now() - parseInt(savedTime);
+        if (elapsed < 3600000) {
+          currentEmail = saved;
+          createdAt = parseInt(savedTime);
+          showEmail();
+          fetchInbox();
+          startAutoRefresh();
+          updateTimer();
+          return;
+        }
+      }
+
+      generateNew();
+    }
+
+    function generateNew() {
+      fetch(API_URL + "/api/generate")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            currentEmail = data.email;
+            createdAt = data.created_at;
+            localStorage.setItem("tempmail_address", currentEmail);
+            localStorage.setItem("tempmail_created", String(createdAt));
+            showEmail();
+            fetchInbox();
+            startAutoRefresh();
+            updateTimer();
+          }
+        })
+        .catch(function(err) {
+          document.getElementById("emailAddress").textContent = "Error loading...";
+        });
+    }
+
+    function showEmail() {
+      document.getElementById("emailAddress").textContent = currentEmail;
+    }
+
+    function fetchInbox() {
+      var encoded = encodeURIComponent(currentEmail);
+      fetch(API_URL + "/api/inbox/" + encoded)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            renderInbox(data.messages);
+            document.getElementById("inboxCount").textContent = String(data.count);
+          }
+        })
+        .catch(function(err) {
+          console.error("Fetch inbox error:", err);
+        });
+    }
+
+    function renderInbox(messages) {
+      var container = document.getElementById("inboxContent");
+      if (!messages || messages.length === 0) {
+        container.innerHTML = '<div class="empty-inbox"><p>No emails yet. Send an email to the address above!</p><p>Auto-refresh every 5 seconds.</p></div>';
+        return;
+      }
+
+      var html = '<ul class="email-list">';
+      for (var i = 0; i < messages.length; i++) {
+        var msg = messages[i];
+        var time = new Date(msg.received_at).toLocaleString();
+        html += '<li class="email-item" onclick="openEmail(\'' + msg.id + '\')">';
+        html += '<div class="email-sender">' + escapeHtml(msg.sender) + '</div>';
+        html += '<div class="email-subject">' + escapeHtml(msg.subject) + '</div>';
+        html += '<div class="email-time">' + time + '</div>';
+        html += '</li>';
+      }
+      html += '</ul>';
+      container.innerHTML = html;
+    }
+
+    function openEmail(id) {
+      fetch(API_URL + "/api/email/" + id)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            var email = data.email;
+            document.getElementById("modalSubject").textContent = email.subject;
+            document.getElementById("modalMeta").innerHTML =
+              "<span><strong>From:</strong> " + escapeHtml(email.sender) + "</span>" +
+              "<span><strong>To:</strong> " + escapeHtml(email.address) + "</span>" +
+              "<span><strong>Date:</strong> " + new Date(email.received_at).toLocaleString() + "</span>";
+
+            if (email.html && email.html.indexOf("<") !== -1) {
+              document.getElementById("modalBody").innerHTML = email.html;
+            } else {
+              document.getElementById("modalBody").textContent = email.body || "(Empty)";
+            }
+            document.getElementById("modalOverlay").classList.add("active");
+          }
+        });
+    }
+
+    function startAutoRefresh() {
+      if (refreshInterval) clearInterval(refreshInterval);
+      refreshInterval = setInterval(fetchInbox, 5000);
+    }
+
+    function updateTimer() {
+      setInterval(function() {
+        var elapsed = Date.now() - createdAt;
+        var remaining = 3600000 - elapsed;
+        if (remaining <= 0) {
+          document.getElementById("timer").textContent = "Expired! Generate a new address.";
+          if (refreshInterval) clearInterval(refreshInterval);
+          return;
+        }
+        var mins = Math.floor(remaining / 60000);
+        var secs = Math.floor((remaining % 60000) / 1000);
+        document.getElementById("timer").textContent = "Expires in: " + mins + "m " + secs + "s";
+      }, 1000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    document.getElementById("btnCopy").addEventListener("click", function() {
+      navigator.clipboard.writeText(currentEmail).then(function() {
+        var btn = document.getElementById("btnCopy");
+        btn.textContent = "Copied!";
+        setTimeout(function() { btn.textContent = "Copy"; }, 2000);
+      });
+    });
+
+    document.getElementById("btnNew").addEventListener("click", function() {
+      localStorage.removeItem("tempmail_address");
+      localStorage.removeItem("tempmail_created");
+      generateNew();
+    });
+
+    document.getElementById("btnRefresh").addEventListener("click", fetchInbox);
+
+    document.getElementById("modalClose").addEventListener("click", function() {
+      document.getElementById("modalOverlay").classList.remove("active");
+    });
+
+    document.getElementById("modalOverlay").addEventListener("click", function(e) {
+      if (e.target === this) this.classList.remove("active");
+    });
+
+    init();
+  </script>
+</body>
+</html>
